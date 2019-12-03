@@ -329,3 +329,59 @@ order by student_subj.student_id;
     for row in rows:
         print(row)
     con.commit()
+
+def not_all_req_subjs_selected(): 
+    cur = con.cursor()
+    cur.execute(f'''
+select * from
+(select id from student
+
+except
+
+select r4.student_id from
+(select student_subj.student_id,count(student_subj.subj_id) from
+student_subj,req_subj
+where student_subj.subj_id = req_subj.subj_id
+group by student_id
+order by student_id)
+as r4
+where r4.count = (select count(*) from req_subj)) as t
+order by id;
+    ''')
+    rows = cur.fetchall()
+    print("Students with not all required subjs selected")
+    print("student_id")
+    for row in rows:
+        print(row[0])
+    con.commit()
+
+def not_their_district():
+    cur = con.cursor()
+    cur.execute(f'''
+select r6.student_id,r6.classroom_id,r7.district_id as sdi,
+	   r8.district_id as cdi,r6.exam_id
+from
+(select student_distrib.student_id, exam_distrib.exam_id,
+	   exam_distrib.classroom_id
+from
+student_distrib, exam_distrib
+where student_distrib.exam_distrib_id=exam_distrib.id)
+as r6,
+(select student.id,school.district_id 
+from student,school where
+student.school_id = school.id)
+as r7,
+(select classroom.id,school.district_id 
+from classroom,school where
+classroom.school_id = school.id)
+as r8
+where r6.student_id=r7.id and
+	  r6.classroom_id=r8.id and 
+	  r7.district_id <> r8.district_id;
+    ''')
+    rows = cur.fetchall()
+    print("Students in classroom of not their district") 
+    print("(student_id, classroom_id, stud distr, class distr, exam_id)")
+    for row in rows:
+        print(row)
+    con.commit()
