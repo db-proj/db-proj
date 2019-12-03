@@ -118,3 +118,151 @@ def get_exams(subjs):
         exam2['id'] = len(exams) + 1  
         exams.append(exam2)
     return exams
+
+def fill_data():
+    districts = get_districts()
+    schools = get_schools(districts)
+    classrooms = get_classrooms(schools)
+    students = get_students(schools)
+    subjs = get_subjs()
+    req_subjs = get_req_subjs(subjs)
+    student_subjs = get_student_subjs(students, subjs, req_subjs)
+    exams = get_exams(subjs)
+    rers = get_rers()
+
+    exam_distribs = []
+    for classroom in classrooms:
+        for exam in exams:
+            exam_distrib = {}
+            exam_distrib['id'] = len(exam_distribs) + 1
+            exam_distrib['classroom_id'] = classroom['id']
+            exam_distrib['exam_id'] = exam['id']
+            exam_distribs.append(exam_distrib)
+
+    student_distribs = []
+    grades = []
+    student_rers = []
+    for student in students:
+        this_student_subjs = []
+        for i in student_subjs:
+            if (i['student_id'] == student['id']):
+                this_student_subjs.append(i['subj_id'])
+
+        for subj_id in this_student_subjs:
+            #skip some
+            if (random.randint(0, 3) == 1):
+                break
+
+            subj_exam1 = {}
+            subj_exam2 = {}
+            for exam in exams:
+                if (exam['subj_id'] == subj_id):
+                    if (bool(subj_exam1)):
+                        subj_exam2 = exam
+                    else:
+                        subj_exam1 = exam
+
+            if (subj_exam1['day'] > subj_exam2['day']):
+                subj_exam1, subj_exam2 = subj_exam2, subj_exam1
+
+            exam_distrib = {}
+            student_distrib1 = {}
+            student_distrib2 = {}
+            need_second_exam = False
+            for i in exam_distribs:
+                if (i['exam_id'] == subj_exam1['id'] and \
+                    random.randint(0, 5) == 1):
+
+                    student_distrib1['student_id'] = student['id']
+                    student_distrib1['exam_distrib_id'] = i['id']
+
+                    if (random.randint(0, 4) != 1):
+                        grade = {}
+                        grade['student_id'] = student['id']
+                        grade['exam_id'] = subj_exam1['id']
+                        grade['grade'] = random.randint(0, 100)
+                        grades.append(grade)
+                        if (grade['grade'] < 30):
+                            need_second_exam = True
+                    else:
+                        need_second_exam = True
+                        student_rer = {}
+                        for rer in rers:
+                            if (random.randint(0, 1) == 1):
+                                student_rer = {}
+                                student_rer['student_id'] = student['id']
+                                student_rer['subj_id'] = subj_id
+                                student_rer['rer_id'] = rer['id']
+                                student_rers.append(student_rer)
+                                break
+
+                    student_distribs.append(student_distrib1)
+                    break
+
+            for i in exam_distribs:
+                if (not need_second_exam):
+                    break
+                if (i['exam_id'] == subj_exam2['id'] and \
+                    random.randint(0, 6) == 1):
+
+                    student_distrib2['student_id'] = student['id']
+                    student_distrib2['exam_distrib_id'] = i['id']
+                    if (random.randint(0, 4) != 1):
+                        grade = {}
+                        grade['student_id'] = student['id']
+                        grade['exam_id'] = subj_exam2['id']
+                        grade['grade'] = random.randint(0, 100)
+                        grades.append(grade)
+                    student_distribs.append(student_distrib2)
+                    break
+
+
+for district in districts:
+    district_add_raw(district['name'])
+
+for school in schools:
+    school_add_raw(school['district_id'], school['name'])
+
+for classroom in classrooms:
+    classroom_add_raw(classroom['school_id'], classroom['capacity'])
+
+for student in students:
+    student_add_raw(student['first_name'],
+                    student['last_name'],
+                    student['school_id'])
+
+for subj in subjs:
+    subj_add_raw(subj['description'], subj['min_grade'])
+
+for req_subj in req_subjs:
+    req_subj_add_raw(req_subj['subj_id'])
+
+for exam in exams:
+    exam_add_raw(exam['subj_id'], exam['day'])
+
+for student_subj in student_subjs:
+    student_subj_add_raw(student_subj['student_id'],
+                         student_subj['subj_id'])
+
+for grade in grades:
+    grade_add_raw(grade['student_id'], grade['exam_id'],
+                  grade['grade'])
+
+for exam_distrib in exam_distribs:
+    exam_distrib_add_raw(exam_distrib['classroom_id'],
+                         exam_distrib['exam_id'])
+
+for student_distrib in student_distribs:
+    student_distrib_add_raw(student_distrib['student_id'],
+                            student_distrib['exam_distrib_id'])
+
+for rer in rers:
+    rer_add_raw(rer['description'])
+
+for student_rer in student_rers:
+    student_rer_add_raw(student_rer['student_id'],
+                        student_rer['rer_id'],
+                        student_rer['subj_id'])
+
+if __name__ == "__main__":
+    fill_data()
