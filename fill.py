@@ -328,3 +328,5 @@ if __name__ == "__main__":
     not_assigned_to_1st_exam_of_selected_subj()
     not_all_req_subjs_selected()
     not_their_district()
+    in_classroom_of_their_school()
+    overfilled_classrooms()

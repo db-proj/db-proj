@@ -385,3 +385,49 @@ where r6.student_id=r7.id and
     for row in rows:
         print(row)
     con.commit()
+
+def in_classroom_of_their_school():
+    cur = con.cursor()
+    cur.execute(f'''
+select student.id as student_id, classroom.id as classroom_id,
+	   student.school_id as ssi,
+	   classroom.school_id as csi,
+	   r6.exam_id
+from
+(select student_distrib.student_id, exam_distrib.exam_id,
+	   exam_distrib.classroom_id
+from
+student_distrib, exam_distrib
+where student_distrib.exam_distrib_id=exam_distrib.id)
+as r6,student,classroom
+where
+r6.student_id=student.id and classroom.id=r6.classroom_id
+and student.school_id=classroom.school_id;
+    ''')
+    rows = cur.fetchall()
+    print("Students in classrooms of their school")
+    print("(student_id, classroom, stud school, class school, exam_id)")
+    for row in rows:
+        print(row)
+    con.commit()
+
+def overfilled_classrooms():
+    cur = con.cursor()
+    cur.execute(f'''
+select s1.classroom_id, s1.exam_id, s1.cnt, classroom.capacity
+from
+(select exam_id,classroom_id,count(student_id) as cnt from
+student_distrib,exam_distrib where
+student_distrib.exam_distrib_id = exam_distrib.id
+group by exam_id, classroom_id)
+as s1,
+classroom
+where s1.classroom_id = classroom.id and
+	  s1.cnt > classroom.capacity;
+    ''')
+    rows = cur.fetchall()
+    print("Overfilled classrooms")
+    print("(classroom, exam, cnt, capacity)")
+    for row in rows:
+        print(row)
+    con.commit()
