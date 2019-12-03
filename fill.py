@@ -322,3 +322,5 @@ def fill_data(from_conf):
 if __name__ == "__main__":
     #  fill_data(from_conf = False)
     fill_data(from_conf = True)
+    students_not_allowed_for_rsrv()
+    students_with_rer_not_assigned_rsrv()
