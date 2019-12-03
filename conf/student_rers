@@ -1,0 +1,12 @@
+- rer_id: 1
+  student_id: 2
+  subj_id: 2
+- rer_id: 1
+  student_id: 12
+  subj_id: 2
+- rer_id: 2
+  student_id: 15
+  subj_id: 2
+- rer_id: 2
+  student_id: 17
+  subj_id: 1

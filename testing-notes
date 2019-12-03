@@ -1,0 +1,56 @@
+Students not allowed for rsrv exam:
+Students in classrooms of their school:
+Students with not all required subjs selected
+- first_name: Missed
+  id: 16
+  last_name: Exam
+  school_id: 1
+Students with rer not assigned to rsrv exam
+- first_name: bla
+  id: 17
+  last_name: bla
+  school_id: 1
+- rer_id: 2
+  student_id: 17
+  subj_id: 1
+
+
+subjs
+- student_id: 16
+  subj_id: 1
+- student_id: 17
+  subj_id: 1
+
+stud distr
+- exam_distrib_id: 81
+  student_id: 16
+- exam_distrib_id: 81
+  student_id: 17
+
+exam_distr
+- classroom_id: 11
+  exam_id: 1
+  id: 81
+
+Overfilled classrooms
+- capacity: 0
+  id: 11
+  school_id: 1
+
+
+
+Students with low grades not assigned for rsrv exam:
+Students in classroom of not their district
+- first_name: bla
+  id: 18
+  last_name: bla
+  school_id: 1 (disrt:3)
+subj:1,exam:2,
+exam_ds:2 - class:1 - school:4 - distr:2
+
+
+not_assigned_to_1st_exam_of_selected_subj
+- first_name: bla
+  id: 19
+  last_name: bla
+  school_id: 1
