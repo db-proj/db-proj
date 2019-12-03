@@ -246,3 +246,86 @@ where t3.student_id is NULL;
         print(row[0], row[1])
     con.commit()
 
+def students_with_low_grades_not_assigned_rsrv():
+    cur = con.cursor()
+    cur.execute(f'''
+select t8.student_id,t8.subj_id,t8.grade,t8.min_grade,t3.exam_id 
+from
+(select t7.student_id, t7.subj_id, t7.grade, subj.min_grade
+from
+subj,
+(select t6.student_id, t6.subj_id, t6.grade
+from
+(select grade.student_id, exam.subj_id, grade.grade, exam.id as exam_id
+from
+grade, exam
+where
+grade.exam_id = exam.id) as t6,
+(select exam.id as exam_id, exam.subj_id, exam.day
+from exam,
+(select subj_id, min(day) as day
+from exam
+group by subj_id order by subj_id) as t1
+where exam.day = t1.day) as t00
+where
+t6.exam_id = t00.exam_id) as t7
+where t7.subj_id = subj.id and subj.min_grade > t7.grade)
+as t8
+left join
+(select t2.student_id, t2.exam_id, t2.subj_id from
+(select t1.student_id, t1.exam_id, exam.subj_id
+from
+exam,
+(select student_distrib.student_id, exam_distrib.exam_id
+from
+student_distrib, exam_distrib
+where student_distrib.exam_distrib_id=exam_distrib.id) as t1
+where
+exam.id = t1.exam_id) as t2,
+(select exam.id, exam.subj_id, exam.day
+from exam,
+(select subj_id, max(day) as day
+from exam
+group by subj_id order by subj_id) as t1
+where exam.day = t1.day) as t0
+where
+t0.id = t2.exam_id)
+as t3
+on t8.student_id=t3.student_id and t8.subj_id=t3.subj_id
+where t3.exam_id is NULL;
+    ''')
+    rows = cur.fetchall()
+    print("Students with low grades not assigned for rsrv exam:")
+    print("(student_id, subj_id, grade, min_grade)")
+    for row in rows:
+        print(row[0], row[1], row[2], row[3])
+    con.commit()
+
+def not_assigned_to_1st_exam_of_selected_subj():
+    cur = con.cursor()
+    cur.execute(f'''
+select student_subj.student_id,student_subj.subj_id from
+student_subj
+left join
+(select t1.student_id, t1.exam_id, exam.subj_id
+from
+exam,
+(select student_distrib.student_id, exam_distrib.exam_id
+from
+student_distrib, exam_distrib
+where student_distrib.exam_distrib_id=exam_distrib.id) as t1
+where
+exam.id = t1.exam_id)
+as t2
+on t2.subj_id = student_subj.subj_id and
+   t2.student_id = student_subj.student_id
+where
+	t2.exam_id is NULL
+order by student_subj.student_id;
+    ''')
+    rows = cur.fetchall()
+    print("not_assigned_to_1st_exam_of_selected_subj")
+    print("(student_id, subj_id)")
+    for row in rows:
+        print(row)
+    con.commit()

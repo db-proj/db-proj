@@ -324,3 +324,5 @@ if __name__ == "__main__":
     fill_data(from_conf = True)
     students_not_allowed_for_rsrv()
     students_with_rer_not_assigned_rsrv()
+    students_with_low_grades_not_assigned_rsrv()
+    not_assigned_to_1st_exam_of_selected_subj()
